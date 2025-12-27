@@ -83,8 +83,8 @@ export default function App() {
                 <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px]">
                   Total Balance
                 </p>
-<p className="text-[#2a7525] text-[9.5px] font-bold tracking-[0.11em] leading-none uppercase font-mono">
-  1,0
+<p className="text-[#2a7525] text-[10px] font-bold tracking-[0.11em] leading-none uppercase font-mono">
+  1,000,000.00 USD
 </p>
              </div>
 
