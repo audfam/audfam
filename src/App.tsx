@@ -61,7 +61,7 @@ export default function App() {
       
       {/* Header Section */}
       <header className="pt-12 pb-2 w-full flex flex-col items-center h-[80px]">
-       <h1 className="text-[16px] font-semibold tracking-tight text-[#2a7525] font-crypto">
+       <h1 className="text-[14px] font-semibold tracking-tight text-white font-crypto">
   AU Internal Wallet Finance Department Only
 </h1>
 </header>
@@ -80,7 +80,7 @@ export default function App() {
 
               {/* Title & Scaled Balance Section */}
               <div className="text-center mb-7 flex flex-col items-center">
-                <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px]">
+                <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px] font-crypto">
                   Total Balance
                 </p>
 <p className="text-[#2a7525] text-[10px] font-bold tracking-[0.11em] leading-none uppercase font-mono">
