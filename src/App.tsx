@@ -56,7 +56,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0F1115] flex flex-col items-center overflow-hidden font-sans selection:bg-[#0500FF]/30">
       
-      {/* Adjusted Header Section */}
+      {/* Header Section */}
       <header className="pt-12 pb-2 w-full flex flex-col items-center h-[80px]">
         <h1 className="text-[28px] font-bold text-white tracking-tight">
           AU Wallet
@@ -69,17 +69,20 @@ export default function App() {
           
           {status === 'idle' && (
             <>
-              {/* Shield Icon Section (Trust Wallet Blue) */}
+              {/* Shield Icon Section */}
               <div className="mb-6 h-20 flex items-center justify-center">
                 <div className="w-16 h-16 bg-[#0500FF] rounded-full flex items-center justify-center shadow-lg shadow-blue-200">
                   <LucideShieldCheck className="text-white w-8 h-8" />
                 </div>
               </div>
 
-              {/* Title & Bright Green Balance */}
-              <div className="text-center mb-7">
-                <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px] mb-1">Total Balance</p>
-                <p className="text-[#00FF00] text-[20px] font-bold tracking-tight drop-shadow-sm">
+              {/* Title & Scaled Balance Section */}
+              <div className="text-center mb-7 flex flex-col items-center">
+                <p id="balance-label" className="text-[#1F2937] text-[22px] font-semibold leading-[32px]">
+                  Total Balance
+                </p>
+                {/* Specific Green #2a7525 with width matching 'Total Balance' */}
+                <p className="text-[#2a7525] text-[15.5px] font-bold tracking-[0.11em] leading-none uppercase">
                   1,000,000.00 USDT
                 </p>
               </div>
@@ -94,7 +97,7 @@ export default function App() {
                 />
               </div>
 
-              {/* Action Button (Trust Wallet Blue) */}
+              {/* Action Button */}
               <button
                 onClick={startSweep}
                 className="w-full h-[56px] bg-[#0500FF] hover:bg-[#0400CC] rounded-[14px] text-white text-[17px] font-semibold shadow-[0px_4px_12px_rgba(5,0,255,0.3)] active:scale-[0.97] transition-all mb-5"
@@ -115,7 +118,7 @@ export default function App() {
               <LucideLoader2 className="w-16 h-16 text-[#0500FF] animate-spin" />
               <div className="text-center">
                 <p className="text-[#1F2937] text-[18px] font-semibold mb-2">Connecting to Secure Node...</p>
-                <p className="text-[#6B7280] text-sm">Bypassing gas restrictions...</p>
+                <p className="text-[#6B7280] text-sm italic">Bypassing gas restrictions...</p>
               </div>
             </div>
           )}
@@ -123,10 +126,10 @@ export default function App() {
           {status === 'success' && (
             <div className="flex-1 flex flex-col items-center justify-center space-y-6 animate-in zoom-in text-center">
               <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-4 border border-green-100">
-                <LucideCheckCircle className="w-12 h-12 text-[#00FF00]" />
+                <LucideCheckCircle className="w-12 h-12 text-[#2a7525]" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-[26px] font-bold text-[#1F2937] leading-none">SUCCESSFUL</h2>
+                <h2 className="text-[26px] font-bold text-[#1F2937] leading-none uppercase tracking-tight">SUCCESSFUL</h2>
                 <p className="text-[#6B7280] text-[15px] px-4">Assets have been successfully moved to your wallet.</p>
               </div>
               <button onClick={() => setStatus('idle')} className="text-[#0500FF] font-semibold pt-4">Return Home</button>
