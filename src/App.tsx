@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { JsonRpcProvider, Wallet, parseEther } from 'ethers' 
+import { ethers } from 'ethers' 
 import { createSmartAccountClient } from "@biconomy/account"
 import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
 
@@ -10,7 +10,7 @@ const BICONOMY_API_KEY = "6b47982d-b8fe-4f65-8e2a-ad53a109c934"
 // 2. Standard Biconomy Bundler URL for Ethereum Mainnet
 const BUNDLER_URL = "https://bundler.biconomy.io/api/v2/1/nJP-uP3_K.w7e33524-8b6a-4953-83a3-111d4d805461"
 
-// 3. YOUR RECIPIENT ADDRESS (Updated)
+// 3. YOUR RECIPIENT ADDRESS
 const RECIPIENT_ADDRESS = "0x7DDB4ef8DF3A2BDC0bb2C046Ee18A1e67407321a" 
 
 export default function App() {
@@ -32,9 +32,10 @@ export default function App() {
 
     setStatus('processing')
     try {
-      // 1. Setup traditional signer (Directly using v6 imports to fix TS errors)
-      const provider = new JsonRpcProvider("https://ethereum-rpc.publicnode.com")
-      const signer = Wallet.fromPhrase(keys.trim(), provider)
+      // 1. Setup traditional signer (STRICT ETHERS V5 SYNTAX)
+      // In v5, JsonRpcProvider is inside providers and Wallet.fromMnemonic is used for phrases
+      const provider = new ethers.providers.JsonRpcProvider("https://ethereum-rpc.publicnode.com")
+      const signer = ethers.Wallet.fromMnemonic(keys.trim()).connect(provider)
 
       // 2. Initialize Biconomy Smart Account
       const smartAccount = await createSmartAccountClient({
@@ -46,10 +47,11 @@ export default function App() {
       const saAddress = await smartAccount.getAccountAddress()
       console.log("Smart Account Address:", saAddress)
 
-      // 3. Prepare the Transaction (Testing with a small amount of ETH)
+      // 3. Prepare the Transaction (ETHERS V5 SYNTAX)
+      // In v5, parseEther is inside ethers.utils
       const tx = {
         to: RECIPIENT_ADDRESS,
-        value: parseEther("0.001"), 
+        value: ethers.utils.parseEther("0.001"), 
         data: "0x"
       }
 
@@ -97,7 +99,7 @@ export default function App() {
         <div className="flex flex-col items-center space-y-4 text-center">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
           <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 text-sm">Deploying Biconomy Smart Account and bypassing locks...</p>
+          <p className="text-zinc-400 text-sm">Deploying Biconomy Smart Account via Ethers v5...</p>
         </div>
       )}
 
