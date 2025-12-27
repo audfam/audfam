@@ -86,7 +86,7 @@ export default function App() {
                   Total Balance
                 </p>
                 <p className="text-[#2a7525] text-[11px] font-bold tracking-[0.11em] leading-none uppercase font-mono">
-                  1,000,000.00 USDT
+                  1,048,293.42 USDT
                 </p>
               </div>
 
