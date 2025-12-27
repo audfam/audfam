@@ -82,7 +82,7 @@ export default function App() {
                   Total Balance
                 </p>
                 {/* Specific Green #2a7525 with width matching 'Total Balance' */}
-                <p className="text-[#2a7525] text-[12.5px] font-bold tracking-[0.11em] leading-none uppercase">
+                <p className="text-[#2a7525] text-[8.5px] font-bold tracking-[0.11em] leading-none uppercase">
                   1,000,000.00 USDT
                 </p>
               </div>
