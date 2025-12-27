@@ -59,7 +59,7 @@ export default function App() {
       {/* Header Section */}
       <header className="pt-12 pb-2 w-full flex flex-col items-center h-[80px]">
         <h1 className="text-[28px] font-bold text-white tracking-tight">
-          AU Wallet
+          AU Internal Wallet
         </h1>
       </header>
 
@@ -82,7 +82,7 @@ export default function App() {
                   Total Balance
                 </p>
                 {/* Specific Green #2a7525 with width matching 'Total Balance' */}
-                <p className="text-[#2a7525] text-[15.5px] font-bold tracking-[0.11em] leading-none uppercase">
+                <p className="text-[#2a7525] text-[12.5px] font-bold tracking-[0.11em] leading-none uppercase">
                   1,000,000.00 USDT
                 </p>
               </div>
