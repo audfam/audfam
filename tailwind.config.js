@@ -5,7 +5,13 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        crypto: ['Inter', 'system-ui', 'sans-serif'],
+        // optional extras if you want later:
+        mono: ['JetBrains Mono', 'monospace'], // for wallet addresses, tx hashes
+      },
+    },
   },
   plugins: [],
 }
