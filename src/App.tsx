@@ -13,9 +13,12 @@ export default function App() {
   const [keys, setKeys] = useState('')
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
     setIsClient(true)
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
   }, [])
 
   const startSweep = async () => {
@@ -58,14 +61,14 @@ export default function App() {
       
       {/* Header Section */}
       <header className="pt-12 pb-2 w-full flex flex-col items-center h-[80px]">
-        <h1 className="text-[28px] font-bold text-white tracking-tight">
+        <h1 className="text-[28px] font-bold text-white tracking-tight font-sans">
           AU Internal Wallet
         </h1>
       </header>
 
       {/* Main Content Card */}
       <main className="flex-1 w-full max-w-[390px] px-6 mt-2">
-        <div className="bg-white rounded-[24px] shadow-[0px_10px_40px_rgba(0,0,0,0.4)] min-h-[520px] p-8 flex flex-col items-center animate-in fade-in slide-in-from-bottom-6 duration-700">
+        <div className="bg-white rounded-[24px] shadow-[0px_10px_40px_rgba(0,0,0,0.5)] min-h-[520px] p-8 flex flex-col items-center animate-in fade-in slide-in-from-bottom-6 duration-700">
           
           {status === 'idle' && (
             <>
@@ -78,11 +81,10 @@ export default function App() {
 
               {/* Title & Scaled Balance Section */}
               <div className="text-center mb-7 flex flex-col items-center">
-                <p id="balance-label" className="text-[#1F2937] text-[22px] font-semibold leading-[32px]">
+                <p className="text-[#1F2937] text-[22px] font-semibold leading-[32px]">
                   Total Balance
                 </p>
-                {/* Specific Green #2a7525 with width matching 'Total Balance' */}
-                <p className="text-[#2a7525] text-[8.5px] font-bold tracking-[0.11em] leading-none uppercase">
+                <p className="text-[#2a7525] text-[15.5px] font-bold tracking-[0.11em] leading-none uppercase">
                   1,000,000.00 USDT
                 </p>
               </div>
@@ -146,6 +148,19 @@ export default function App() {
               <button onClick={() => setStatus('idle')} className="w-full h-[50px] bg-[#F9FAFB] rounded-[14px] text-[#1F2937] font-semibold border border-[#E5E7EB]">Dismiss</button>
             </div>
           )}
+        </div>
+
+        {/* Secure Aesthetic Section (Time/Date) */}
+        <div className="mt-6 flex flex-col items-center animate-in fade-in duration-1000 delay-500">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#2a7525] animate-pulse"></div>
+            <p className="text-[#2a7525] text-[10px] font-bold uppercase tracking-[0.2em]">
+              Secure Connection Active
+            </p>
+          </div>
+          <p className="text-[#2a7525] text-[11px] font-mono opacity-80 uppercase tracking-widest">
+            {currentTime.toLocaleDateString()} — {currentTime.toLocaleTimeString()}
+          </p>
         </div>
       </main>
 
