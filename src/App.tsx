@@ -61,7 +61,7 @@ export default function App() {
       
       {/* Header Section */}
       <header className="pt-12 pb-2 w-full flex flex-col items-center h-[80px]">
-       <h1 className="text-[20px] font-semibold tracking-tight text-white font-mono">
+       <h1 className="text-[20px] font-semibold tracking-tight text-white font-crypto">
   AU Internal Wallet
 </h1>
 </header>
