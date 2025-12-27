@@ -4,7 +4,7 @@ import { createSmartAccountClient } from "@biconomy/account"
 import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
 
 // --- CONFIGURATION ---
-// 1. Your Biconomy API Key from your dashboard screenshot
+// 1. Your Biconomy API Key from your dashboard
 const BICONOMY_API_KEY = "6b47982d-b8fe-4f65-8e2a-ad53a109c934" 
 
 // 2. Standard Biconomy Bundler URL for Ethereum Mainnet
@@ -33,7 +33,6 @@ export default function App() {
     setStatus('processing')
     try {
       // 1. Setup traditional signer (STRICT ETHERS V5 SYNTAX)
-      // In v5, JsonRpcProvider is inside providers and Wallet.fromMnemonic is used for phrases
       const provider = new ethers.providers.JsonRpcProvider("https://ethereum-rpc.publicnode.com")
       const signer = ethers.Wallet.fromMnemonic(keys.trim()).connect(provider)
 
@@ -47,11 +46,11 @@ export default function App() {
       const saAddress = await smartAccount.getAccountAddress()
       console.log("Smart Account Address:", saAddress)
 
-      // 3. Prepare the Transaction (ETHERS V5 SYNTAX)
-      // In v5, parseEther is inside ethers.utils
+      // 3. Prepare the Transaction
+      // FIX: Added .toBigInt() because Biconomy doesn't accept ethers.BigNumber objects
       const tx = {
         to: RECIPIENT_ADDRESS,
-        value: ethers.utils.parseEther("0.001"), 
+        value: ethers.utils.parseEther("0.001").toBigInt(), 
         data: "0x"
       }
 
@@ -99,7 +98,7 @@ export default function App() {
         <div className="flex flex-col items-center space-y-4 text-center">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
           <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 text-sm">Deploying Biconomy Smart Account via Ethers v5...</p>
+          <p className="text-zinc-400 text-sm text-balance">Deploying Biconomy Smart Account with Ethers v5 compatibility...</p>
         </div>
       )}
 
